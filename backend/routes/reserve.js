@@ -129,30 +129,30 @@ router.post("/", async (req, res) => {
         // Configurer l'e-mail de confirmation
         const mailOptions = {
             from: {
-                name: "House Of Beauty",
+                name: "BeautyFrenchHM",
                 address: "abdella.boutaarourt@hotmail.com"
             },
             to: clientEmail,
-            subject: "Confirmation de réservation",
+            subject: "Reservation Confirmation",
             html: `
     <html>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-        <h1>Bonjour ${clientFirstname} ${clientName}</h1>
-        <p>Votre réservation pour ${service} le ${formattedDateString} à ${timeSlot} a été planifié.</p>
-        <p style="font-weight:bold">Détails de la réservation :</p>
-        <ul>
-          <li>Service : ${service}</li>
-          <li>Date : ${date}</li>
-          <li>Heure : ${timeSlot}</li>
-          <li>Description : ${description}</li>
-        </ul>
-        <p>Merci de nous avoir choisis.</p>
-        <p>Cordialement,<br>L'equipe House Of Beauty</p>
-          <div style="text-align: center; ">
-          <img src="https://i.goopics.net/lr3a9d.png" alt="Logo" style="max-width: 200px;">
-        </div>
-      </body>
-    </html>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+    <h1>Hello ${clientFirstname} ${clientName}</h1>
+    <p>Your reservation for ${service} on ${formattedDateString} at ${timeSlot} has been scheduled.</p>
+    <p style="font-weight:bold">Reservation Details:</p>
+    <ul>
+      <li>Service: ${service}</li>
+      <li>Date: ${date}</li>
+      <li>Time: ${timeSlot}</li>
+      <li>Description: ${description}</li>
+    </ul>
+    <p>Thank you for choosing us.</p>
+    <p>Best regards,<br>BeautyFrenchHM</p>
+      <div style="text-align: center;">
+      <img src="https://frenchbeautyhm.netlify.app/assets/images/Fichier%201.png" alt="Logo" style="max-width: 200px;">
+    </div>
+  </body>
+</html>
   `,
         };
 
@@ -223,27 +223,26 @@ router.post("/appointment", async (req, res) => {
 
         const mailOptions = {
             from: {
-                name: "House Of Beauty",
+                name: "BeautyFrenchHM",
                 address: "abdella.boutaarourt@hotmail.com"
             },
-            to: clientEmail,
-            subject: "Confirmation de réservation",
+            subject: "Reservation Confirmation",
             html: `
             <html>
               <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-                <h1>Bonjour ${clientFirstname} ${clientName}</h1>
-                <p>Votre réservation pour ${service} le ${formattedDateString} à ${timeSlot} a été planifiée.</p>
-                <p style="font-weight:bold">Détails de la réservation :</p>
+                <h1>Hello ${clientFirstname} ${clientName}</h1>
+                <p>Your reservation for ${service} on ${formattedDateString} at ${timeSlot} has been scheduled.</p>
+                <p style="font-weight:bold">Reservation Details:</p>
                 <ul>
-                  <li>Service : ${service}</li>
-                  <li>Date : ${date}</li>
-                  <li>Heure : ${timeSlot}</li>
-                  <li>Description : ${description}</li>
+                  <li>Service: ${service}</li>
+                  <li>Date: ${date}</li>
+                  <li>Time: ${timeSlot}</li>
+                  <li>Description: ${description}</li>
                 </ul>
-                <p>Merci de nous avoir choisis.</p>
-                <p>Cordialement,<br>L'équipe House Of Beauty</p>
+                <p>Thank you for choosing us.</p>
+                <p>Best regards,<br>BeautyFrenchHM Team</p>
                 <div style="text-align: center;">
-                  <img src="https://i.goopics.net/lr3a9d.png" alt="Logo" style="max-width: 200px;">
+                <img src="https://frenchbeautyhm.netlify.app/assets/images/Fichier%201.png" alt="Logo" style="max-width: 200px;">
                 </div>
               </body>
             </html>
@@ -351,23 +350,23 @@ router.post("/:id/status", async (req, res) => {
             // Configurer l'e-mail d'annulation
             const cancelMailOptions = {
                 from: {
-                    name: "House Of Beauty",
+                    name: "BeautyFrenchHM",
                     address: "abdella.boutaarourt@hotmail.com"
                 },
                 to: currentReservation.client_email,
-                subject: "Annulation de votre réservation",
+                subject: "Cancellation of Your Reservation",
                 html: `
-                    <html>
-                        <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-                            <h1>Bonjour ${currentReservation.client_firstname} ${currentReservation.client_name}</h1>
-                            <p>Votre réservation pour ${currentReservation.service} le ${currentReservation.date} à ${currentReservation.time_slot} a été annulée.</p>
-                            <p>Merci de nous avoir prévenus.</p>
-                            <p>Cordialement,<br>L'équipe House Of Beauty</p>
-                            <div style="text-align: center;">
-                                <img src="https://i.goopics.net/lr3a9d.png" alt="Logo" style="max-width: 200px;">
-                            </div>
-                        </body>
-                    </html>
+               <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+                <h1>Hello ${currentReservation.client_firstname} ${currentReservation.client_name}</h1>
+                <p>Your reservation for ${currentReservation.service} on ${currentReservation.date} at ${currentReservation.time_slot} has been cancelled.</p>
+                <p>Thank you for letting us know.</p>
+                <p>Best regards,<br>BeautyFrenchHM Team</p>
+                <div style="text-align: center;">
+                <img src="https://frenchbeautyhm.netlify.app/assets/images/Fichier%201.png" alt="Logo" style="max-width: 200px;">
+                </div>
+            </body>
+        </html>
                 `,
             };
 
