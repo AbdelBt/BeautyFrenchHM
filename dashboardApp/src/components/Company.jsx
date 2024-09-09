@@ -29,7 +29,7 @@ export default function Company() {
   const fetchAvailableDates = async () => {
     try {
       const response = await axios.get(
-        "https://appointment-fr.onrender.com/available-dates"
+        "https://beautyfrenchhm.onrender.com/available-dates"
       );
       setAvailableDates(response.data);
       console.log(response.data);
@@ -41,7 +41,7 @@ export default function Company() {
   const fetchDays = async () => {
     try {
       const response = await axios.get(
-        "https://appointment-fr.onrender.com/indisponibilities"
+        "https://beautyfrenchhm.onrender.com/indisponibilities"
       );
       if (response.data.length > 0) {
         // eslint-disable-next-line no-unused-vars
@@ -62,7 +62,7 @@ export default function Company() {
     }));
     try {
       await axios.post(
-        "https://appointment-fr.onrender.com/indisponibilities",
+        "https://beautyfrenchhm.onrender.com/indisponibilities",
         {
           day: day.charAt(0).toUpperCase() + day.slice(1),
           value: updatedState,
@@ -110,7 +110,7 @@ export default function Company() {
     }
 
     try {
-      await axios.post("https://appointment-fr.onrender.com/available-dates", {
+      await axios.post("https://beautyfrenchhm.onrender.com/available-dates", {
         from_date: dateRange.from,
         to_date: dateRange.to,
       });
