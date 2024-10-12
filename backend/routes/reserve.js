@@ -112,7 +112,7 @@ router.post("/", async (req, res) => {
                     client_name: clientName,
                     client_email: clientEmail,
                     client_phone: phoneNumber,
-                    status: "pending",
+                    status: "confirmed",
                     client_firstname: clientFirstname,
                     employe_email: email,
                 },
@@ -207,7 +207,7 @@ router.post("/appointment", async (req, res) => {
                     client_name: clientName,
                     client_email: clientEmail,
                     client_phone: phoneNumber,
-                    status: "pending",
+                    status: "confirmed",
                     client_firstname: clientFirstname,
                     employe_email: email,
                 },
@@ -216,7 +216,7 @@ router.post("/appointment", async (req, res) => {
         if (reservationError) throw reservationError;
 
         const formattedDate = new Date(date);
-        const formattedDateString = formattedDate.toLocaleDateString("fr-FR", {
+        const formattedDateString = formattedDate.toLocaleDateString("en", {
             month: "long",
             day: "numeric",
         });
@@ -226,6 +226,7 @@ router.post("/appointment", async (req, res) => {
                 name: "BeautyFrenchHM",
                 address: "abdella.boutaarourt@hotmail.com"
             },
+            to: clientEmail,
             subject: "Reservation Confirmation",
             html: `
             <html>
