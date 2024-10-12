@@ -90,11 +90,16 @@ export default function Sidebar({ handleLogout }) {
           "https://beautyfrenchhm.onrender.com/available-dates"
         );
         if (availableDatesResponse.data.length > 0) {
-          const { from_date, to_date } = availableDatesResponse.data[0];
+          let { from_date, to_date } = availableDatesResponse.data[0];
+          let fromDate = new Date(from_date);
+          const toDate = new Date(to_date);
+          fromDate.setDate(fromDate.getDate() - 1);
+
           setAvailableDateRange({
-            from: new Date(from_date),
-            to: new Date(to_date),
+            from: new Date(fromDate),
+            to: new Date(toDate),
           });
+          console.log(availableDateRange);
         }
       }
     } catch (error) {
@@ -212,25 +217,59 @@ export default function Sidebar({ handleLogout }) {
     fetchServices();
   }, []);
 
-  const getTime = () => {
-    const timeList = [];
-    for (let i = 9; i <= 21; i++) {
-      const hour = i < 10 ? "0" + i : i; // Format hour to always be two digits
-      const time = hour + ":00";
-      const isUnavailable = isTimeUnavailableForDate(
-        time,
-        date,
-        employeeIds,
-        employeeDaysOff,
-        unavailableDays,
-        employeeDaysOffWeek,
-        employeeAvailablePeriods
+  const getTime = async () => {
+    try {
+      // Récupérer les horaires de travail depuis le backend
+      const response = await axios.get(
+        "https://beautyfrenchhm.onrender.com/available-dates/working-hours"
       );
-      timeList.push({ time, isUnavailable });
-    }
+      const workingHours = response.data;
 
-    setTimeSlot(timeList);
+      // Assurez-vous que date est définie et correspond au jour sélectionné
+      const selectedDay = new Date(date).toLocaleDateString("en-US", {
+        weekday: "long",
+      });
+
+      // Filtrer les horaires pour le jour sélectionné
+      const dayHours = workingHours.find(
+        (item) => item.day_of_week === selectedDay
+      );
+
+      // Création d'un tableau pour les créneaux horaires disponibles
+      const timeList = [];
+
+      // Définir des heures globales par défaut si aucune information n'est trouvée
+      const defaultStartHour = 10;
+      const defaultEndHour = 18;
+
+      // Utiliser les horaires récupérés pour définir les heures
+      const startHour = dayHours ? dayHours.start_hour : defaultStartHour;
+      const endHour = dayHours ? dayHours.end_hour : defaultEndHour;
+
+      for (let i = startHour; i <= endHour; i++) {
+        const hour = i < 10 ? "0" + i : i; // Formater l'heure pour avoir toujours deux chiffres
+        const time = hour + ":00";
+
+        // Fonction pour vérifier si le créneau est disponible
+        const isUnavailable = isTimeUnavailableForDate(
+          time,
+          date,
+          employeeIds,
+          employeeDaysOff,
+          unavailableDays,
+          employeeDaysOffWeek,
+          employeeAvailablePeriods
+        );
+
+        timeList.push({ time, isUnavailable });
+      }
+
+      setTimeSlot(timeList);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des horaires :", error);
+    }
   };
+
   useEffect(() => {
     if (date) {
       getTime(date);
