@@ -34,7 +34,7 @@ function Login({ setIsAuthenticated }) {
     e.preventDefault();
     try {
       const response = await fetch(
-        "https://beautyfrenchhm.onrender.com/user/login",
+        "https://beautyfrenchhm-55cg.onrender.com/user/login",
         {
           method: "POST",
           headers: {

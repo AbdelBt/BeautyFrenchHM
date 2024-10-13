@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { addDays, format, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import PropTypes from "prop-types";
 import axios from "axios";
@@ -25,7 +25,7 @@ export function DatePickerWithRange({ className, onSelect }) {
   const fetchAvailableDates = async () => {
     try {
       const response = await axios.get(
-        "https://beautyfrenchhm.onrender.com/available-dates"
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates"
       );
       setAvailableDates(response.data);
       if (response.data.length > 0) {

@@ -44,7 +44,7 @@ export default function Company() {
   const getTime = async () => {
     try {
       const response = await axios.get(
-        "https://beautyfrenchhm.onrender.com/available-dates/working-hours"
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates/working-hours"
       );
       const workingHoursData = response.data;
 
@@ -74,7 +74,7 @@ export default function Company() {
   const fetchSpecialDays = async () => {
     try {
       const response = await axios.get(
-        "https://beautyfrenchhm.onrender.com/available-dates/special-days"
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates/special-days"
       );
       const specialDaysData = response.data;
       specialDaysData.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -107,7 +107,7 @@ export default function Company() {
   const fetchDays = async () => {
     try {
       const response = await axios.get(
-        "https://beautyfrenchhm.onrender.com/indisponibilities"
+        "https://beautyfrenchhm-55cg.onrender.com/indisponibilities"
       );
       if (response.data.length > 0) {
         // eslint-disable-next-line no-unused-vars
@@ -128,7 +128,7 @@ export default function Company() {
     }));
     try {
       await axios.post(
-        "https://beautyfrenchhm.onrender.com/indisponibilities",
+        "https://beautyfrenchhm-55cg.onrender.com/indisponibilities",
         {
           day: day.charAt(0).toUpperCase() + day.slice(1),
           value: updatedState,
@@ -182,10 +182,13 @@ export default function Company() {
     }
 
     try {
-      await axios.post("https://beautyfrenchhm.onrender.com/available-dates", {
-        from_date: fromDate.toISOString(), // Convertir en format ISO
-        to_date: toDate.toISOString(), // Convertir en format ISO
-      });
+      await axios.post(
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates",
+        {
+          from_date: fromDate.toISOString(), // Convertir en format ISO
+          to_date: toDate.toISOString(), // Convertir en format ISO
+        }
+      );
       toast({
         description: `Dates added successfully from ${fromDateStr} to ${toDateStr}`,
         status: "success",
@@ -368,7 +371,7 @@ export default function Company() {
       };
 
       await axios.post(
-        "https://appointment-fr-12d3.onrender.com/available-dates/working-hours",
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates/working-hours",
         {
           day_of_week: selectedDay,
           start_hour: selectedOpeningHour.split(":")[0],
