@@ -7,7 +7,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -76,7 +76,9 @@ export default function Company() {
       const response = await axios.get(
         "https://beautyfrenchhm-55cg.onrender.com/available-dates/special-days"
       );
+      setSpecialDays(response.data);
       const specialDaysData = response.data;
+
       specialDaysData.sort((a, b) => new Date(a.date) - new Date(b.date));
       console.log(specialDaysData);
       // Initialize hours for each special day
@@ -251,8 +253,6 @@ export default function Company() {
   };
 
   const handleSpecialTimeSlotClick = (time, date) => {
-    console.log("Clicked Time:", time);
-
     const currentHours = specialDayHours[date] || {
       openingHour: null,
       closingHour: null,
@@ -285,7 +285,6 @@ export default function Company() {
       }
     } else {
       if (time === openingHour) {
-        console.log("Deselecting Opening Hour:", openingHour);
         setSpecialDayHours((prev) => ({
           ...prev,
           [date]: { ...prev[date], openingHour: null },
@@ -329,9 +328,9 @@ export default function Company() {
 
     try {
       await axios.post(
-        "https://beautyfrenchhm-55cg.onrender.comdqsdqs/available-dates/special-days",
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates/special-days",
         {
-          date: date, // Use the passed date
+          date: addOneDay(date),
           opening_hour: currentHours.openingHour + ":00",
           closing_hour: currentHours.closingHour + ":00",
         }
@@ -348,6 +347,57 @@ export default function Company() {
       console.error("Error saving special day hours:", error);
       toast({
         description: `Failed to save special day hours.`,
+        status: "error",
+        className: "bg-[#ff0000]",
+      });
+    }
+  };
+
+  const handleChangeSpecialTimes = async (date) => {
+    const currentHours = specialDayHours[date];
+
+    try {
+      await axios.post(
+        "https://beautyfrenchhm-55cg.onrender.com/available-dates/special-days",
+        {
+          date: date,
+          opening_hour: currentHours.openingHour + ":00",
+          closing_hour: currentHours.closingHour + ":00",
+        }
+      );
+      await fetchSpecialDays();
+      toast({
+        description: `Special day hours saved successfully for ${new Date(
+          date
+        ).toLocaleDateString()}.`,
+        status: "success",
+        className: "bg-[#008000]",
+      });
+    } catch (error) {
+      console.error("Error saving special day hours:", error);
+      toast({
+        description: `Failed to save special day hours.`,
+        status: "error",
+        className: "bg-[#ff0000]",
+      });
+    }
+  };
+
+  const handleDeleteSpecialTimes = async (day) => {
+    try {
+      await axios.delete(
+        `https://beautyfrenchhm-55cg.onrender.com/available-dates/special-days/${day}`
+      );
+      await fetchSpecialDays();
+      toast({
+        description: `Special day hours deleted successfully for`,
+        status: "success",
+        className: "bg-[#008000]",
+      });
+    } catch (error) {
+      console.error("Error deleted special day hours:", error);
+      toast({
+        description: `Failed to deleted special day hours.`,
         status: "error",
         className: "bg-[#ff0000]",
       });
@@ -620,8 +670,13 @@ export default function Company() {
                         value={`special-day-${dayIndex}`}
                       >
                         <AccordionTrigger>
-                          <div className="w-full">
+                          <div className="flex  justify-center  gap-5 items-center w-full">
                             {new Date(day.date).toLocaleDateString()}
+                            <Trash2
+                              className=" text-red-500 cursor-pointer hover:scale-150"
+                              size={20}
+                              onClick={() => handleDeleteSpecialTimes(day.id)}
+                            />
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
@@ -663,9 +718,9 @@ export default function Company() {
                           <div className="mt-5">
                             <Button
                               type="button"
-                              onClick={() => handleSaveSpecialTimes(day.date)}
+                              onClick={() => handleChangeSpecialTimes(day.date)}
                             >
-                              Save Special Times for{" "}
+                              Save Special Times for
                               {new Date(day.date).toLocaleDateString()}
                             </Button>
                           </div>
