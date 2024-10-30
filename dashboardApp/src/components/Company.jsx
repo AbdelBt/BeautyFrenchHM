@@ -59,7 +59,7 @@ export default function Company() {
       setWorkingHours(workingHoursMap);
 
       const timeList = [];
-      for (let i = 10; i <= 18; i++) {
+      for (let i = 9; i <= 22; i++) {
         const hour = i < 10 ? "0" + i : i;
         const time = hour + ":00";
         timeList.push({ time });
@@ -99,7 +99,7 @@ export default function Company() {
     fetchSpecialDays();
     // Initialize timeSlot array with available times
     const times = [];
-    for (let i = 10; i <= 18; i++) {
+    for (let i = 10; i <= 22; i++) {
       times.push(`${i < 10 ? "0" + i : i}:00`);
     }
     setTimeSlot(times);
@@ -328,11 +328,14 @@ export default function Company() {
     }
 
     try {
-      await axios.post("http://localhost:3000/available-dates/special-days", {
-        date: date, // Use the passed date
-        opening_hour: currentHours.openingHour + ":00",
-        closing_hour: currentHours.closingHour + ":00",
-      });
+      await axios.post(
+        "https://beautyfrenchhm-55cg.onrender.comdqsdqs/available-dates/special-days",
+        {
+          date: date, // Use the passed date
+          opening_hour: currentHours.openingHour + ":00",
+          closing_hour: currentHours.closingHour + ":00",
+        }
+      );
       await fetchSpecialDays();
       toast({
         description: `Special day hours saved successfully for ${new Date(
