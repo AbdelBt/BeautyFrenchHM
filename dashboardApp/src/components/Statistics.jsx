@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Doughnut, Bar } from "react-chartjs-2";
+import { Doughnut, Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -103,14 +103,15 @@ const Statistics = () => {
         (res) => res.last_reservation === true
       );
 
-      const lastReservationsCount = lastReservations.length;
-
       setLastReservationData({
         labels: serviceLabels,
         datasets: [
           {
             label: "Finished Packages",
-            data: [lastReservationsCount],
+            data: serviceLabels.map(
+              (label) =>
+                lastReservations.filter((res) => res.service === label).length
+            ),
             backgroundColor: ["#2196F3", "#4CAF50", "#FF5722", "#FFC107"],
           },
         ],
@@ -185,14 +186,14 @@ const Statistics = () => {
             <p>Total Clients: {totalCustomers}</p>
           </div>
         </div>
-        <div className="chart shadow-md rounded-lg p-6 w-3/6 border border-gray-300">
+        <div className="chart shadow-md rounded-lg p-6 w-3/6 border border-gray-300 mb-5">
           <h3 className="text-lg font-semibold mb-4">Packages finished</h3>
-          <Bar
+          <Pie
             data={lastReservationData}
             options={{
               responsive: true,
               plugins: {
-                legend: false,
+                legend: true,
                 datalabels: {
                   color: "white",
                 },
