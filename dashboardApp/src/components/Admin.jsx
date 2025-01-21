@@ -120,7 +120,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="admin-page w-full text-white flex lg:flex-row flex-col-reverse mx-5 pt-5">
+    <div className="admin-page w-full text-white flex flex-col-reverse mx-5 pt-5">
       <div className="mx-5 mb-5">
         <h1 className="text-4xl font-bold mb-5">Create an account</h1>
         <Card className="mx-auto max-w-sm">

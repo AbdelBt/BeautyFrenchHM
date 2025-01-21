@@ -12,6 +12,7 @@ import {
   Plus,
   Building2,
   CalendarCog,
+  AlignStartVertical,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -546,6 +547,11 @@ export default function Sidebar({ handleLogout }) {
           link: "/Calender",
           icon: <CalendarCheck />,
           text: "Calender",
+        },
+        {
+          link: "/Statistics",
+          icon: <AlignStartVertical />,
+          text: "Statistics",
         },
         {
           link: "/MyAvailabilities",

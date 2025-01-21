@@ -9,6 +9,7 @@ import Calender from "./components/Calender";
 import Company from "./components/Company";
 import MyAvailabilities from "./components/MyAvailabilities";
 import Admin from "./components/Admin";
+import Statistics from "./components/Statistics";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,6 +42,7 @@ function App() {
               path="/Calender"
               element={<Calender setIsAuthenticated={setIsAuthenticated} />}
             />
+            <Route path="/Statistics" element={<Statistics />} />
             <Route
               path="/MyAvailabilities"
               element={
