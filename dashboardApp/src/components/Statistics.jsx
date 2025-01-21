@@ -28,8 +28,8 @@ const Statistics = () => {
   const [userData, setUserData] = useState(null);
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastReservationData, setLastReservationData] = useState(null);
 
-  // Fonction pour récupérer les données des réservations avec axios
   const fetchReservationData = async () => {
     try {
       const response = await axios.get(
@@ -49,8 +49,6 @@ const Statistics = () => {
         return reservationDate >= fromDate && reservationDate <= toDate;
       });
 
-      console.log("Filtered Reservations:", filteredReservations);
-
       const allPhones = filteredReservations
         .filter((res) => res.client_phone)
         .map((res) => res.client_phone);
@@ -67,13 +65,6 @@ const Statistics = () => {
         )
       );
       const returningUsersCount = returningUsersSet.size;
-
-      console.log(
-        "New Users:",
-        newUsersCount,
-        "Returning sers:",
-        returningUsersCount
-      );
 
       // Mettre à jour les données du graphique des utilisateurs
       setUserData({
@@ -102,6 +93,24 @@ const Statistics = () => {
         datasets: [
           {
             data: serviceCounts,
+            backgroundColor: ["#2196F3", "#4CAF50", "#FF5722", "#FFC107"],
+          },
+        ],
+      });
+
+      // Handle last reservations
+      const lastReservations = filteredReservations.filter(
+        (res) => res.last_reservation === true
+      );
+
+      const lastReservationsCount = lastReservations.length;
+
+      setLastReservationData({
+        labels: serviceLabels,
+        datasets: [
+          {
+            label: "Finished Packages",
+            data: [lastReservationsCount],
             backgroundColor: ["#2196F3", "#4CAF50", "#FF5722", "#FFC107"],
           },
         ],
@@ -175,6 +184,21 @@ const Statistics = () => {
           <div className="text-center text-lg mt-3 text-white">
             <p>Total Clients: {totalCustomers}</p>
           </div>
+        </div>
+        <div className="chart shadow-md rounded-lg p-6 w-3/6 border border-gray-300">
+          <h3 className="text-lg font-semibold mb-4">Packages finished</h3>
+          <Bar
+            data={lastReservationData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: false,
+                datalabels: {
+                  color: "white",
+                },
+              },
+            }}
+          />
         </div>
       </div>
     </div>

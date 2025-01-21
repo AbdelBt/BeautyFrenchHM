@@ -6,6 +6,9 @@ import listPlugin from "@fullcalendar/list";
 import { FiCheckCircle } from "react-icons/fi";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
+
 import {
   Phone,
   Mail,
@@ -33,6 +36,8 @@ export default function Calendar() {
   const dialogRef = useRef();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [editedDescription, setEditedDescription] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     const user = sessionStorage.getItem("user");
@@ -74,12 +79,11 @@ export default function Calendar() {
 
   const handleEventClick = (arg) => {
     const event = arg.event;
-    console.log("Event object:", event);
     setSelectedEvent(event);
 
     const isFinished = event.extendedProps.last_reservation;
     setIsFinished(isFinished);
-    console.log("isFinished after event click:", isFinished);
+    setEditedDescription(event.extendedProps.description || "");
     showDialog();
   };
 
@@ -97,7 +101,7 @@ export default function Calendar() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3000/reserve/${selectedEvent.id}/finish`,
+        `https://beautyfrenchhm-55cg.onrender.com/reserve/${selectedEvent.id}/finish`,
         {
           last_reservation: !isFinished,
         },
@@ -121,10 +125,54 @@ export default function Calendar() {
         );
         setIsFinished(!isFinished);
         fetchReservations();
-
-        console.log("Reservation updated successfully:", response.data);
       } else {
         console.error("Error updating reservation:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
+  const handleEditDescriptionClick = async () => {
+    if (!selectedEvent?.id) {
+      console.error("Error: Event ID is missing.");
+      return;
+    }
+
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/reserve/${selectedEvent.id}/description`,
+        {
+          description: editedDescription,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const updatedEvent = {
+          ...selectedEvent,
+          extendedProps: {
+            ...selectedEvent.extendedProps,
+            description: editedDescription,
+          },
+        };
+
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === updatedEvent.id ? updatedEvent : event
+          )
+        );
+        fetchReservations();
+        toast({
+          title: "Description updated successfully!",
+          status: "success",
+          className: "bg-[#008000]",
+        });
+      } else {
+        console.error("Error updating description:", response.statusText);
       }
     } catch (error) {
       console.error("Error:", error.message);
@@ -148,9 +196,10 @@ export default function Calendar() {
         description: selectedEvent.extendedProps.description,
       }
     : null;
+
   return (
     <div style={{ width: "100%", height: "98vh" }} className="text-white m-5">
-      {/* AlertDialog personnalisé */}
+      <Toaster />
       <AlertDialog>
         <AlertDialogTrigger
           ref={dialogRef}
@@ -182,12 +231,15 @@ export default function Calendar() {
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <span className="flex font-bold	 text-black min-w-[120px] text-lg">
-                        <Info /> &nbsp; info:
+                      <span className="flex font-bold text-black min-w-[120px] text-lg">
+                        <Info /> &nbsp; Info:
                       </span>
-                      <span className="font-bold text-black text-lg">
-                        {eventDetails.description}
-                      </span>
+                      <textarea
+                        className="font-bold text-black text-lg"
+                        value={editedDescription}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                        rows="3"
+                      />
                     </li>
                     <li className="flex items-start">
                       <span className="flex font-bold	 text-black min-w-[120px] text-lg">
@@ -219,6 +271,12 @@ export default function Calendar() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
+            <Button
+              onClick={handleEditDescriptionClick}
+              className="transition-all duration-300 bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Save Description
+            </Button>
             <Button
               onClick={handleFinishClick}
               className={`transition-all duration-300 ${
