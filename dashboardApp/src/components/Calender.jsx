@@ -3,6 +3,9 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import { FiCheckCircle } from "react-icons/fi";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
 import {
   Phone,
   Mail,
@@ -22,14 +25,14 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog"; // Assurez-vous d'importer vos composants d'alerte-dialogue personnalisés
-
+} from "@/components/ui/alert-dialog";
 export default function Calendar() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
-  const dialogRef = useRef(); // Référence pour AlertDialogTrigger
+  const dialogRef = useRef();
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
     const user = sessionStorage.getItem("user");
@@ -56,10 +59,12 @@ export default function Calendar() {
         clientName: `${reservation.client_firstname} ${reservation.client_name}`,
         clientEmail: reservation.client_email,
         clientPhone: reservation.client_phone,
-        // Combine date and time in 24-hour format
-        // Vous pouvez ajuster le format de la date si nécessaire
+        id: reservation.id,
+        last_reservation:
+          reservation.last_reservation !== null
+            ? reservation.last_reservation
+            : false,
       }));
-      console.log(formattedEvents);
       setEvents(formattedEvents);
       setIsLoading(false);
     } catch (error) {
@@ -68,21 +73,66 @@ export default function Calendar() {
   };
 
   const handleEventClick = (arg) => {
-    // Gérer le clic sur un événement dans le calendrier
-    setSelectedEvent(arg.event); // Enregistrer l'événement sélectionné
+    const event = arg.event;
+    console.log("Event object:", event);
+    setSelectedEvent(event);
 
-    showDialog(); // Afficher le dialogue personnalisé
+    const isFinished = event.extendedProps.last_reservation;
+    setIsFinished(isFinished);
+    console.log("isFinished after event click:", isFinished);
+    showDialog();
   };
 
   const showDialog = () => {
-    // Fonction pour afficher le dialogue
     if (dialogRef.current) {
-      dialogRef.current.click(); // Déclencher le dialogue via la référence
+      dialogRef.current.click();
+    }
+  };
+
+  const handleFinishClick = async () => {
+    if (!selectedEvent?.id) {
+      console.error("Error: Event ID is missing.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/reserve/${selectedEvent.id}/finish`,
+        {
+          last_reservation: !isFinished,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const updatedEvent = {
+          ...selectedEvent,
+          last_reservation: !isFinished,
+        };
+
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === updatedEvent.id ? updatedEvent : event
+          )
+        );
+        setIsFinished(!isFinished);
+        fetchReservations();
+
+        console.log("Reservation updated successfully:", response.data);
+      } else {
+        console.error("Error updating reservation:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Ou afficher un spinner ou un message de chargement
+    return <div>Loading...</div>;
   }
 
   const eventDetails = selectedEvent
@@ -169,6 +219,22 @@ export default function Calendar() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
+            <Button
+              onClick={handleFinishClick}
+              className={`transition-all duration-300 ${
+                isFinished
+                  ? "!bg-red-500 text-white"
+                  : "!bg-green-500 text-white transform scale-105"
+              } px-4 py-2 rounded`}
+            >
+              {isFinished ? (
+                <>Cancel Package Finished</>
+              ) : (
+                <>
+                  <FiCheckCircle /> &nbsp; Package Finished
+                </>
+              )}
+            </Button>
             <AlertDialogAction>Close</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -181,7 +247,7 @@ export default function Calendar() {
         slotLabelFormat={{
           hour: "2-digit",
           minute: "2-digit",
-          hour12: false, // Utiliser le format 24 heures
+          hour12: false,
           meridiem: false,
         }}
         headerToolbar={{
@@ -191,8 +257,34 @@ export default function Calendar() {
         }}
         events={events}
         height="100%"
-        selectable={true} // Permet la sélection de plage de dates
-        eventClick={handleEventClick} // Gérer le clic sur un événement
+        selectable={true}
+        eventClick={handleEventClick}
+        eventContent={(eventInfo) => (
+          <div className="flex items-center">
+            <span
+              className={`fc-event-dot ${
+                eventInfo.event.extendedProps.last_reservation
+                  ? "bg-red-500"
+                  : "bg-blue-500"
+              }`}
+              style={{
+                marginRight: "10px",
+                borderRadius: "50%",
+                width: "10px",
+                height: "10px",
+              }}
+            ></span>
+            <span
+              className={`fc-event-title ${
+                eventInfo.event.extendedProps.last_reservation
+                  ? "text-white"
+                  : ""
+              }`}
+            >
+              {eventInfo.event.title}
+            </span>
+          </div>
+        )}
       />
     </div>
   );

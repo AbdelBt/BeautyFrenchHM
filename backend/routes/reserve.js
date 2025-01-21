@@ -443,6 +443,30 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+router.post("/:id/finish", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { last_reservation } = req.body;
+
+        if (typeof last_reservation !== "boolean") {
+            return res.status(400).json({ message: "Invalid value for last_reservation" });
+        }
+        const { data, error } = await supabase
+            .from("reservations")
+            .update({ last_reservation })
+            .eq("id", id);
+
+
+        if (error) throw error;
+
+
+        res.status(200).json({ message: `Reservation updated successfully`, data });
+    } catch (error) {
+        console.error("Error updating reservation:", error.message);
+        res.status(500).json({ message: "Server error while updating reservation" });
+    }
+});
+
 // Tâche planifiée pour supprimer les réservations plus de 18 mois
 cron.schedule("0 0 1 * *", async () => { // Exécuter à minuit le 1er de chaque mois
     try {
