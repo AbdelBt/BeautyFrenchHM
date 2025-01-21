@@ -140,7 +140,7 @@ export default function Calendar() {
 
     try {
       const response = await axios.patch(
-        `http://localhost:3000/reserve/${selectedEvent.id}/description`,
+        `https://beautyfrenchhm-55cg.onrender.com/reserve/${selectedEvent.id}/description`,
         {
           description: editedDescription,
         },
