@@ -22,7 +22,19 @@ router.post('/login', async (req, res) => {
             throw error;
         }
 
-        res.status(200).json({ message: 'User logged in successfully', data });
+        const user = data.user;
+
+        const { data: roleData, error: roleError } = await supabase
+            .from('roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .single();
+
+        if (roleError || !roleData || roleData.role !== 'admin') {
+            return res.status(403).json({ error: 'Access denied. Admins only.' });
+        }
+
+        res.status(200).json({ message: 'User logged in successfully', data: user });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
