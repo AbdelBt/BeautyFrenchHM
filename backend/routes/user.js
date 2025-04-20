@@ -54,7 +54,7 @@ router.post('/signup', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const { user, error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
         });
@@ -63,8 +63,33 @@ router.post('/signup', async (req, res) => {
             throw error;
         }
 
+        const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-        res.status(201).json({ message: 'User created successfully', user });
+        // Set each weekday as unavailable for the new user
+        const { error: insertError } = await supabase
+            .from('employee_days')
+            .insert(weekdays.map(day => ({
+                employee_email: email,
+                day_of_week: day,
+                available: false,
+            })));
+
+        if (insertError) {
+            throw insertError;
+        }
+
+        const user = data.user;
+
+        const { error: roleError } = await supabase
+            .from('roles')
+            .insert([{ user_id: user.id, role: 'admin' }]);
+
+        if (roleError) {
+            return res.status(500).json({ error: 'User created but failed to assign role' });
+        }
+
+        res.status(201).json({ message: 'Admin user created successfully', user });
+
     } catch (error) {
         console.error('Error creating user:', error.message);
         res.status(500).json({ error: 'Failed to create user' });
