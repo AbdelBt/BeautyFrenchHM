@@ -24,28 +24,36 @@ router.post('/login', async (req, res) => {
 
         const user = data.user;
 
+        if (!user) {
+            return res.status(400).json({ error: 'User not found' });
+        }
+
         const { data: roleData, error: roleError } = await supabase
             .from('roles')
             .select('role')
             .eq('user_id', user.id)
             .single();
 
-        if (roleError || !roleData || roleData.role !== 'admin') {
+        if (roleError) {
+            return res.status(400).json({ error: 'Error fetching role' });
+        }
+
+        if (roleData.role !== 'admin') {
             return res.status(403).json({ error: 'Access denied. Admins only.' });
         }
 
-        res.status(200).json({ message: 'User logged in successfully', data: user });
+        res.status(200).json({ message: 'User logged in successfully', data: data });
+
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
 
-// Route POST pour créer un compte utilisateur
+
 router.post('/signup', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Créer un utilisateur avec Supabase Auth
         const { user, error } = await supabase.auth.signUp({
             email,
             password,
@@ -55,7 +63,6 @@ router.post('/signup', async (req, res) => {
             throw error;
         }
 
-        // Vous pouvez ajouter d'autres traitements ici, comme l'envoi de courriels de vérification, etc.
 
         res.status(201).json({ message: 'User created successfully', user });
     } catch (error) {
@@ -64,7 +71,6 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-// Route GET pour récupérer tous les utilisateurs
 router.get('/users', async (req, res) => {
     try {
         const { data, error } = await supabase.auth.admin.listUsers();
