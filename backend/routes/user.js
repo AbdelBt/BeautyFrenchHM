@@ -96,6 +96,54 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+router.post('/signin', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        const user = data.user;
+
+        if (!user) {
+            return res.status(400).json({ error: 'User not found' });
+        }
+
+        return res.status(200).json({ message: "Login successful" });
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message || 'Failed to login' });
+    }
+});
+
+router.post('/register', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+        });
+
+        if (error) {
+            throw error;
+        }
+        const user = data.user;
+
+        res.status(201).json({ message: ' user created successfully', user });
+
+    } catch (error) {
+        console.error('Error creating user:', error.message);
+        res.status(500).json({ error: error.message || 'Failed to create user' });
+    }
+});
+
 router.get('/users', async (req, res) => {
     try {
         const { data, error } = await supabase.auth.admin.listUsers();

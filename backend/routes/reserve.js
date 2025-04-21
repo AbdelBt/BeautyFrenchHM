@@ -23,15 +23,29 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const getAvailableEmployeForTimeSlot = async (date, timeSlot) => {
     try {
+
+        const { data: employeRoles, error: rolesError } = await supabase
+            .from("roles")
+            .select("user_id, role")
+            .eq("role", "admin");
+
+        if (rolesError) {
+            throw new Error(`Erreur lors de la récupération des rôles: ${rolesError.message}`);
+        }
+
         // Récupérer tous les utilisateurs
+        const employeUserIds = employeRoles.map(role => role.user_id);
+
         const { data: allUsers, error: fetchUsersError } = await supabase.auth.admin.listUsers()
 
         if (fetchUsersError) {
             throw new Error(`Erreur lors de la récupération des utilisateurs: ${fetchUsersError.message}`);
         }
 
+        const employeUsers = allUsers.users.filter(user => employeUserIds.includes(user.id));
+
         // Parcourir tous les employés pour trouver un employé disponible
-        for (const user of allUsers.users) {
+        for (const user of employeUsers) {
             // Vérifier s'il existe des indisponibilités pour cet employé à ce créneau horaire
             const { data: existingIndisponibilities, error: fetchError } = await supabase
                 .from("reservations")
@@ -59,6 +73,7 @@ const getAvailableEmployeForTimeSlot = async (date, timeSlot) => {
 
             // S'il n'y a pas d'indisponibilités, cet employé est disponible
             if (existingIndisponibilities.length === 0 && daysOff.length === 0) {
+                console.log(user.email)
                 return user.email; // Retourner l'email du premier employé disponible
             }
         }
@@ -69,7 +84,6 @@ const getAvailableEmployeForTimeSlot = async (date, timeSlot) => {
         throw error; // Lancer l'erreur pour la gérer plus haut
     }
 };
-
 
 // Route POST pour créer une réservation
 router.post("/", async (req, res) => {
