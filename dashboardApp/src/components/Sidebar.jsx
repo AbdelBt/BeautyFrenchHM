@@ -604,8 +604,11 @@ export default function Sidebar({ handleLogout }) {
           ? day >= availableDateRange.from && day <= availableDateRange.to
           : true;
 
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 1);
+
       // Vérifier si le jour est marqué comme non disponible dans Days
-      return isUnavailable || !isInAvailableRange || day < new Date() - 1;
+      return isUnavailable || !isInAvailableRange || day < twoDaysAgo;
     },
     [Days, availableDateRange]
   );
