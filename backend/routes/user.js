@@ -115,13 +115,12 @@ router.post('/signin', async (req, res) => {
             return res.status(400).json({ error: 'User not found' });
         }
 
-        return res.status(200).json({ message: "Login successful" });
+        return res.status(200).json({ message: "Login successful", data });
 
     } catch (error) {
         return res.status(500).json({ error: error.message || 'Failed to login' });
     }
 });
-
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
 

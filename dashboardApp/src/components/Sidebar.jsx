@@ -605,14 +605,10 @@ export default function Sidebar({ handleLogout }) {
           : true;
 
       // Vérifier si le jour est marqué comme non disponible dans Days
-      return isUnavailable || !isInAvailableRange || day < new Date();
+      return isUnavailable || !isInAvailableRange || day < new Date() - 1;
     },
     [Days, availableDateRange]
   );
-
-  const isPastDay = (day) => {
-    return day < new Date();
-  };
 
   return (
     <div className="w-[300px] border-r min-h-screen pt-10 sideb">
@@ -706,7 +702,7 @@ export default function Sidebar({ handleLogout }) {
                       onSelect={(selectedDate) => {
                         setDate(selectedDate);
                       }}
-                      disabled={(day) => isPastDay(day) || isDay(day)}
+                      disabled={(day) => isDay(day)}
                       className="rounded-md border"
                     />
                   </div>
